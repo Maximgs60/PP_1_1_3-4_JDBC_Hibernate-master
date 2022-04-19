@@ -22,41 +22,69 @@ public class UserDaoJDBCImpl implements UserDao {
                 "lastName CHAR(20) NOT NULL, " +
                 "age TINYINT UNSIGNED NOT NULL)";
         try (Statement statement = connection.createStatement()) {
+            connection.setAutoCommit(false);
             statement.execute(sqlCommand);
+            connection.commit();
         } catch (SQLException e) {
             e.printStackTrace();
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
         }
     }
 
     public void dropUsersTable() {
         sqlCommand = "DROP TABLE Users";
         try (Statement statement = connection.createStatement()) {
+            connection.setAutoCommit(false);
             statement.executeUpdate(sqlCommand);
+            connection.commit();
         } catch (SQLException e) {
             e.printStackTrace();
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
         }
     }
 
     public void saveUser(String name, String lastName, byte age) {
         sqlCommand = "INSERT INTO Users (name, lastName, age) VALUES (?,?,?)";
         try (PreparedStatement prepareStatement = connection.prepareStatement(sqlCommand)) {
+            connection.setAutoCommit(false);
             prepareStatement.setString(1, name);
             prepareStatement.setString(2, lastName);
             prepareStatement.setByte(3, age);
             prepareStatement.executeUpdate();
+            connection.commit();
             System.out.println("User с именем - " + name + " добавлен в базу данных");
         } catch (SQLException e) {
             e.printStackTrace();
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
         }
     }
 
     public void removeUserById(long id) {
         sqlCommand = "DELETE FROM Users WHERE id = ?";
         try (PreparedStatement prepareStatement = connection.prepareStatement(sqlCommand)) {
+            connection.setAutoCommit(false);
             prepareStatement.setLong(1, id);
             prepareStatement.executeUpdate();
+            connection.commit();
         } catch (SQLException e) {
             e.printStackTrace();
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
         }
     }
 
@@ -83,9 +111,16 @@ public class UserDaoJDBCImpl implements UserDao {
     public void cleanUsersTable() {
         sqlCommand = "TRUNCATE TABLE Users";
         try (Statement statement = connection.createStatement()) {
+            connection.setAutoCommit(false);
             statement.executeUpdate(sqlCommand);
+            connection.commit();
         } catch (SQLException e) {
             e.printStackTrace();
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
         }
     }
 }
